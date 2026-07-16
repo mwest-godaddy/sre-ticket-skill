@@ -1,0 +1,9 @@
+# ignore local claude settings
+.claude/settings.local.json
+.claude/.settings.json.lock
+
+# skill-creator benchmark/eval output (regenerated on each run)
+skills/*-workspace/
+
+# macOS
+.DS_Store
