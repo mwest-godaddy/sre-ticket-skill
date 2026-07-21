@@ -4,7 +4,8 @@ description: >-
   Write, validate, classify, or improve SRE Jira tickets using Google SRE
   principles adapted for Kanban flow. Use this skill whenever someone wants to
   write, draft, or create an SRE or reliability ticket of any type (incident,
-  toil, interrupt, engineering, overhead); review, QA, or validate an existing
+  toil, interrupt, engineering, overhead, or a time-boxed spike/investigation);
+  review, QA, or validate an existing
   ticket; figure out what work type a piece of work should be; write up a
   postmortem action item; or check whether a ticket is ready to leave triage —
   even if they do not explicitly say "SRE". Also invoked by /sre-ticket,
@@ -45,6 +46,11 @@ Apply these throughout every interaction:
 - **Jira tracks work; the monitoring stack tracks reliability.** SLO attainment,
   error budgets, and MTTR live in Grafana/Datadog/equivalent. Jira links to
   them — it does not replicate them.
+- **Spikes must resolve, not dead-end.** A spike is a time-boxed Engineering
+  investigation whose output is knowledge, not a system change. It cannot be
+  closed without either a follow-up ticket capturing the resulting work or an
+  explicit "no action needed" note with a reason. An investigation that answers
+  a question but records no next step is incomplete.
 
 ---
 
@@ -67,6 +73,17 @@ types this month?" If Incident + Toil + Interrupt > 50%, flag it:
 > "Your current ops load appears to be above the 50% threshold. This ticket
 > could be an opportunity — is there an Engineering ticket we should also raise
 > to eliminate or reduce this category of work?"
+
+### Spikes are a special form of Engineering
+A **spike** — a time-boxed investigation to reduce uncertainty before committing
+to implementation — does **not** get a sixth work type. Its output is knowledge,
+so it patterns with Engineering:
+
+- **Work Type stays `Engineering`.** Mark it with a `[SPIKE]` title prefix so it
+  is visible on the board, and use the dedicated Spike template.
+- It counts toward the **engineering side** of the 50% split (it is not ops load).
+- It is **time-boxed** and must end with a follow-up ticket or an explicit
+  "no action needed" note — see the Spike template and the follow-up rule.
 
 ---
 
@@ -238,6 +255,12 @@ Ask:
 2. Which service or product does this relate to?
    (Check against scope — flag if Provisional or Out of Scope)
 
+> **Spike check:** If the work is *investigative* — you need to answer a
+> question or reduce uncertainty before building anything — it is a **Spike**.
+> Its Work Type is still Engineering, but use the Spike question set in Round 2
+> and the Spike template. The tell: the deliverable is a decision or a finding,
+> not a system change.
+
 Use the classification to select the correct template in the Output section.
 
 ---
@@ -272,6 +295,17 @@ Use the classification to select the correct template in the Output section.
   postmortem, planned improvement?)
 - If from a postmortem: which INC, and what type of action is this?
   (Prevent recurrence / Improve detection / Reduce blast radius / Fix process)
+
+**If SPIKE (investigative Engineering):**
+- What specific question does this spike answer? (Frame it so the answer is a
+  yes/no or a concrete recommendation — not "look into X".)
+- What decision is blocked until it's answered? What triggered it?
+- What is the timebox? (A hard limit in hours or days.)
+- What is explicitly *out of scope* for this investigation? (Stops the spike
+  sprawling into implementation.)
+- What form will the findings take, and where will they live?
+- Reminder for the close: this spike must end with either a follow-up ticket or
+  an explicit "no action needed" note.
 
 **If OVERHEAD:**
 - What is the compliance/process requirement?
@@ -543,6 +577,69 @@ the ticket.]
 
 ---
 
+### SPIKE Ticket (time-boxed investigation)
+
+A Spike's output is knowledge, not a system change — use it to reduce
+uncertainty before committing to implementation. Work Type stays **Engineering**
+(the team ends up permanently better informed); the `[SPIKE]` prefix flags it on
+the board. When the timebox expires, the spike ends — whether or not the
+question is fully answered.
+
+```
+Title: [SPIKE] [Question to answer] — [Service name]
+
+Work Type: Engineering (Spike)
+Priority: [P2 / P3 / P4]
+Service / Product: [name]
+Timebox: [e.g. 2 days / 8 hours — a hard limit]
+
+────────────────────────────────────────────
+## Question to Answer
+[The specific question or uncertainty this spike resolves. Frame it so it can
+be answered yes/no or with a concrete recommendation — not "look into X".]
+
+## Why Now
+[What decision is blocked until this is answered? What triggered it — an
+incident pattern, error budget risk, a planned project that needs de-risking?]
+
+## Timebox
+- Hard limit: [X hours / days]
+- When the timebox expires, stop and document findings — even if incomplete.
+
+## Investigation Scope
+In scope:
+- [what you will investigate]
+Out of scope:
+- [what you will not investigate — prevents the spike sprawling into build work]
+
+## Definition of Done
+- [ ] The question above is answered, OR the timebox expired and the findings
+      so far are documented
+- [ ] Findings written up (where: [doc / ticket comment / link])
+- [ ] A recommendation is stated: [proceed / do not proceed / need another spike]
+- [ ] **Follow-up recorded (mandatory — a spike may not close without one):**
+  - [ ] Follow-up Engineering / Toil ticket raised: [link], OR
+  - [ ] Explicitly marked "no action needed" — reason: [one line]
+
+## Findings
+[Fill in as the investigation proceeds — this is the deliverable.]
+
+## Recommendation
+[Fill in at close: what should happen next, and why.]
+
+## Links
+- Related project / epic: [link]
+- Related incidents: [link]
+- Prototype / scratch branch (if any): [link]
+```
+
+> **Follow-up rule:** A spike is not "Done" just because time ran out and notes
+> exist. It closes only when the outcome is captured as a next step — either a
+> concrete follow-up ticket or an explicit "no action needed" with a reason.
+> This is what stops investigations from quietly dead-ending.
+
+---
+
 ### OVERHEAD Ticket
 
 ```
@@ -618,6 +715,15 @@ exact gap and suggest the exact fix.
 - [ ] Out of Scope section is present
 - [ ] If from a postmortem: INC reference and action type are stated
 
+### Spike Tickets
+- [ ] A specific, answerable question is stated (not "investigate X")
+- [ ] A hard timebox is set
+- [ ] Investigation scope has an explicit out-of-scope boundary
+- [ ] Work Type is Engineering with a [SPIKE] marker (not a made-up sixth type)
+- [ ] Definition of Done requires documented findings and a recommendation
+- [ ] Mandatory follow-up: a follow-up ticket is linked OR "no action needed" is
+      explicitly stated with a reason — the spike does not dead-end
+
 ### Overhead Tickets
 - [ ] External driver and deadline are stated
 - [ ] Completion owner is named
@@ -672,9 +778,12 @@ this decision tree — one question at a time.
          to eliminate it?")
 → No  → continue
 
-> Q5: "Does completing this work leave the system in a permanently better
->      state — less risk, less toil, fewer incidents?"
-→ Yes → **Engineering**
+> Q5: "Does completing this work leave things permanently better — the system
+>      (less risk, less toil, fewer incidents) or the team (a decision made,
+>      uncertainty removed)?"
+→ Yes, via a **system change** → **Engineering** (standard template)
+→ Yes, via **knowledge / a decision** → **Engineering — Spike** (time-boxed;
+         use the Spike template and remember the mandatory follow-up rule)
 → No  → return to Q1 and reconsider — all SRE work fits one of these five
 
 Once classified, ask: "Do you want me to help draft the ticket now?"
@@ -720,3 +829,6 @@ Keep these in mind when writing or reviewing any ticket:
 - **Error budget as policy:** When the budget is healthy, accept more
   risk and ship features. When it is burning, reliability work wins
   and the SRE lead can push back on new changes.
+- **Spikes are time-boxed and must resolve:** A spike ends when its timebox
+  expires, not when the engineer feels done. It closes only with a follow-up
+  ticket or an explicit "no action needed" note — never a dead-end.
