@@ -35,7 +35,10 @@ Apply these throughout every interaction:
   loudness.
 - **Kanban, not sprints.** SRE work is interrupt-driven. There are no sprint
   commitments, story points, or velocity targets. Success is measured by lead
-  time, cycle time, and the ops/engineering work ratio.
+  time, cycle time, and the ops/engineering work ratio. Coarse t-shirt sizing
+  (S/M/L/XL) is permitted, but *only* as a signal for whether a ticket should be
+  split — never as story points, velocity, or a commitment. Sizes are never
+  summed or tracked as a metric.
 - **Postmortem action items are Engineering tickets.** They are not a separate
   ticket type. If a postmortem produces an action, classify it by what that
   action *is*: automation = Engineering, manual workaround = Toil, runbook
@@ -149,6 +152,10 @@ A ticket must pass this checklist before it leaves Triage:
       (which SLO is affected, or what toil/risk does this reduce?)
 - [ ] For Incident tickets: INC reference number is linked
 
+> Sizing is not a triage gate, but if a t-shirt size is used, an **XL** ticket
+> should be split before it enters Ready — a single XL item rarely flows well
+> through Kanban.
+
 ---
 
 ## Prioritisation Model
@@ -162,6 +169,32 @@ Priority is set using **reliability signals first**, stakeholder priority second
 | **P3 — Standard** | Planned engineering work with healthy error budget; routine interrupt requests; standard toil items | New monitoring dashboards, runbook improvements, capacity planning, PRRs, routine access requests |
 | **P4 — Low** | No reliability impact; no urgency; background improvements | Documentation tidying, minor tooling improvements, speculative architecture exploration |
 | **Overhead** | Externally imposed deadline | Compliance audit, mandatory training, required certifications |
+
+---
+
+## Ticket Sizing (optional — a split signal, not an estimate)
+
+T-shirt sizing is **optional** and serves exactly one purpose: flagging tickets
+that are too big to flow smoothly and should be split. It is not story points,
+not velocity, not a commitment, and sizes are never summed or tracked as a
+metric — doing any of those turns Kanban back into Scrum.
+
+| Size | Rough meaning | Action |
+|------|---------------|--------|
+| **S** | Hours; a single clear change | Flow as-is |
+| **M** | A day or two; one coherent piece of work | Flow as-is |
+| **L** | Several days; getting large for one ticket | Consider splitting |
+| **XL** | More than ~a week, or spans multiple concerns | **Split it**, or record why it can't be split |
+
+Guidance:
+- Sizing is most useful on **Engineering** tickets. Reactive and bounded work
+  (Incident, most Toil, Interrupt, Overhead) rarely needs it.
+- **Spikes don't take a size — their timebox is the bound.** If a spike feels
+  larger than its timebox, shrink the question, not the clock.
+- An **XL** ticket is a prompt to split *before* it enters Ready. If it
+  genuinely can't be split, note why in the ticket.
+- Never aggregate sizes into a velocity or capacity number. Flow metrics (lead
+  time, cycle time) remain the measure.
 
 ---
 
@@ -503,6 +536,7 @@ Title: [Improve / Implement / Automate / Define] [outcome] — [Service name]
 Work Type: Engineering
 Priority: [P1 / P2 / P3 / P4]
 Service / Product: [name]
+Size (optional): [S / M / L / XL — split signal only; XL should be split]
 Epic: [link to parent reliability epic, if applicable]
 
 ────────────────────────────────────────────
@@ -731,6 +765,10 @@ exact gap and suggest the exact fix.
 
 ### Kanban Hygiene (all tickets)
 - [ ] No story points — this is Kanban, not Scrum
+- [ ] T-shirt size, if present, is used only as a split signal — not story
+      points, velocity, or a commitment
+- [ ] If sized XL: the ticket is split into smaller tickets, or carries an
+      explicit justification for why it can't be split
 - [ ] Not sitting in "In Review" — SRE work is either In Progress or Done
 - [ ] If Engineering: linked to a parent epic or reliability initiative
 - [ ] If Incident: auto-created by webhook, not manually filed mid-incident
