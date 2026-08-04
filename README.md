@@ -1,3 +1,9 @@
+# note - this repo is now archived
+
+The skill has been merged into https://github.com/gdcorp-partners/project-momentum
+
+
+
 # sre-ticket-skill
 
 A [Claude Code](https://claude.com/claude-code) / Claude **skill** for writing, validating,
